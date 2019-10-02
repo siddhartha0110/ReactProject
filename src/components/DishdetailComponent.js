@@ -48,21 +48,18 @@ import { Card, CardImg, CardText, CardBody,
             )
         }
     }
-    const DishDetails=(props)=>{
-        const selectedDish=props.dish;
-        if(selectedDish==null)
-            return(<div></div>);
-        return(
-            <div className="container">
-            <div className="row">
-                <RenderDish dish={selectedDish}/>
-                <RenderComments comments={selectedDish.comments}/>
-            </div>
-            </div>
+const DishDetails=(props)=>{
+    const selectedDish=props.dish;
+    if(selectedDish==null)
+        return(<div></div>);
+    return(
+        <div className="container">
+          <div className="row">
+            <RenderDish dish={selectedDish}/>
+            <RenderComments comments={selectedDish.comments}/>
+          </div>
+        </div>
         )
 
-    }
-       
-
-
+   }  
 export default DishDetails;
