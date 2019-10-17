@@ -3,11 +3,12 @@ import { Card, CardImg, CardText, CardBody,CardTitle, Breadcrumb, BreadcrumbItem
 Modal,ModalHeader,ModalBody,Row,Col,Label } from 'reactstrap';
 import {Link} from 'react-router-dom';
 import{Control,Errors,LocalForm} from 'react-redux-form';
+import {Loading} from './LoadingComponent';
 
     const required = (val) => val && val.length;
 	const maxLength = (len) => (val) => !(val) || (val.length <= len);
 	const minLength = (len) => (val) => !(val) || (val.length >= len);
-	
+    //Adding Comment Form
     class CommentForm extends Component{
         constructor(props){
             super(props)
@@ -17,10 +18,10 @@ import{Control,Errors,LocalForm} from 'react-redux-form';
             this.handleSubmit=this.handleSubmit.bind(this);
             this.toggleModal=this.toggleModal.bind(this);
         }
-
+        
         handleSubmit(values){
-            alert("Submitted Comments:"+JSON.stringify(values));
-            console.log("Submitted Comments:"+JSON.stringify(values));
+            this.toggleModal();
+            this.props.addComment(this.props.dishId,values.rating,values.author,values.comment);
         }
 
         toggleModal(){
@@ -39,7 +40,7 @@ import{Control,Errors,LocalForm} from 'react-redux-form';
                                 <Row className="form-group">
                                     <Col md={2}>
                                         <Label htmlFor="rating">Rating</Label>
-                                        <Control.select model=".rating" name="rating" classaName="form-control">
+                                        <Control.select model=".rating" name="rating" className="form-control">
                                             <option>1</option>
                                             <option>2</option>
                                             <option>3</option>
@@ -50,8 +51,8 @@ import{Control,Errors,LocalForm} from 'react-redux-form';
                                 </Row>
                                 <Row className="form-group">
                                     <Col>
-                                        <Label htmlFor="fname">Name</Label>
-                                        <Control.text model=".fname" name="fname"
+                                        <Label htmlFor="author">Name</Label>
+                                        <Control.text model=".author" name="author"
                                          className="form-control"
                                          validators={{
                                              required,minLength:minLength(2),maxLength:maxLength(15)
@@ -59,7 +60,7 @@ import{Control,Errors,LocalForm} from 'react-redux-form';
                                          />
                                          <Errors
                                          className="text-danger"
-                                         model=".fname"
+                                         model=".author"
                                          show="touched"
                                          messages={{
                                              required:"Required",
@@ -85,7 +86,9 @@ import{Control,Errors,LocalForm} from 'react-redux-form';
         }
     }
 
+    //Rendering the dishes
     function RenderDish({dish}) {
+
         if (dish != null)
             return(
                 <div className="col-12 col-md-5 m-1">
@@ -103,7 +106,9 @@ import{Control,Errors,LocalForm} from 'react-redux-form';
                 <div></div>
             )
       }
-    function RenderComments({comments}){
+
+    //Rendering Comments
+    function RenderComments({comments,addComment,dishId}){
         if(comments==null)
         {
             return(
@@ -127,15 +132,37 @@ import{Control,Errors,LocalForm} from 'react-redux-form';
                 <ul className="list-unstyled">
                     {comment}
                 </ul>
-                <CommentForm/>
+                <CommentForm
+                dishId={dishId}
+                addComment={addComment}
+                />
                 </div>
             )
         }
     }
+
+
 const DishDetails=(props)=>{
     const selectedDish=props.dish;
-    if(selectedDish==null)
-        return(<div></div>);
+    if(props.isLoading){
+        return(
+            <div className="container">
+                <div className="row">
+                    <Loading/>
+                </div>
+            </div>
+        );
+    }
+    else if(props.errMess){
+        return(
+            <div className="container">
+                <div className="row">
+                    <h4>{props.errMess}</h4>
+                </div>
+            </div>
+        );
+    }
+    else if(selectedDish!=null){
     return(
         <div className="container">
             <div className="row">
@@ -150,10 +177,21 @@ const DishDetails=(props)=>{
             </div>
             <div className="row">
                 <RenderDish dish={selectedDish}/>
-                <RenderComments comments={props.comments}/>
+                <RenderComments comments={props.comments}
+                addComment={props.addComment}
+                dishId={props.dish.id}
+                />
             </div>
         </div>
         )
 
    }  
+   else{
+       return(
+           <div>
+               
+           </div>
+       )
+   }
+}
 export default DishDetails;
