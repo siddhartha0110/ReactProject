@@ -22,7 +22,7 @@ import { baseUrl } from '../shared/baseUrl';
         
         handleSubmit(values){
             this.toggleModal();
-            this.props.addComment(this.props.dishId,values.rating,values.author,values.comment);
+            this.props.postComment(this.props.dishId,values.rating,values.author,values.comment);
         }
 
         toggleModal(){
@@ -109,7 +109,7 @@ import { baseUrl } from '../shared/baseUrl';
       }
 
     //Rendering Comments
-    function RenderComments({comments,addComment,dishId}){
+    function RenderComments({comments,postComment,dishId}){
         if(comments==null)
         {
             return(
@@ -135,7 +135,7 @@ import { baseUrl } from '../shared/baseUrl';
                 </ul>
                 <CommentForm
                 dishId={dishId}
-                addComment={addComment}
+                postComment={postComment}
                 />
                 </div>
             )
@@ -179,7 +179,7 @@ const DishDetails=(props)=>{
             <div className="row">
                 <RenderDish dish={selectedDish}/>
                 <RenderComments comments={props.comments}
-                addComment={props.addComment}
+                postComment={props.postComment}
                 dishId={props.dish.id}
                 />
             </div>
