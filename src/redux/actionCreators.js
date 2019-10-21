@@ -6,6 +6,8 @@ export const addComment=(comment)=>({
     payload:comment
 });
 
+
+//POSTING COMMENTS TO SERVER
 export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 
     const newComment = {
@@ -41,6 +43,35 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
     .catch(error =>  { console.log('post comments', error.message); alert('Your comment could not be posted\nError: '+error.message); });
 };
 
+//POSTING FEEDBACK TO SERVER
+export const postFeedback = (feedback) => (dispatch) => {
+
+    const newFeedback = Object.assign({ date: new Date().toISOString() }, feedback);
+    return fetch(baseUrl + 'feedback', {
+        method: "POST",
+        body: JSON.stringify(newFeedback),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "same-origin"
+    })
+    .then(response => {
+        if (response.ok) {
+          return response;
+        } else {
+          var error = new Error('Error ' + response.status + ': ' + response.statusText);
+          error.response = response;
+          throw error;
+        }
+      },
+      error => {
+            throw error;
+      })
+    .then(response => response.json())
+    .then(response => dispatch(addComment(response)))
+    .catch(error =>  { console.log('post feedback', error.message); alert('Your feedback could not be posted\nError: '+error.message); });
+};
+//FETCHING DISHES FROM SERVER
 export const fetchDishes=()=>(dispatch)=>{
     dispatch(dishesLoading(true));
     return fetch(baseUrl + 'dishes')
@@ -77,6 +108,8 @@ export const addDishes=(dishes)=>({
     value:dishes
 })
 
+
+//FETCHING COMMENTS FROM SERVER
 export const fetchComments = () => (dispatch) => {    
     return fetch(baseUrl + 'comments')
     .then(response=>{
@@ -108,6 +141,7 @@ export const addComments = (comments) => ({
     payload: comments
 });
 
+//FETCHING PROMOTIONS FROM SERVER
 export const fetchPromos = () => (dispatch) => {
     
     dispatch(promosLoading());
@@ -144,3 +178,40 @@ export const addPromos = (promos) => ({
     type: actionTypes.ADD_PROMOS,
     payload: promos
 });
+
+//FETCHING LEADERS FROM SERVER
+export const fetchLeaders=()=>(dispatch)=>{
+    dispatch(leadersLoading(true));
+    return fetch(baseUrl + 'leaders')
+    .then(response=>{
+        if(response.ok){
+            return response;
+        }
+        else{
+            var error=new Error('Error'+response.status+":"+response.statusText);
+            error.response=response;
+            throw error;
+        }
+    },
+    error=>{
+        var errMess=new Error(error.message);
+        throw errMess;
+    })
+    .then(response => response.json())
+    .then(leaders => dispatch(addleaders(leaders)))
+    .catch(error=>dispatch(leadersFailed(error.message)));
+}
+
+export const leadersLoading=()=>({
+    type:actionTypes.LEADERS_LOADING
+})
+
+export const leadersFailed=(err)=>({
+    type:actionTypes.LEADERS_FAILED,
+    value:err
+})
+
+export const addleaders=(leaders)=>({
+    type:actionTypes.ADD_LEADERS,
+    value:leaders
+})
